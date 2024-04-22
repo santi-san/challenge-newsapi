@@ -14,8 +14,11 @@ class NewController extends Controller
         $perPage = 10;
         $currentPage = request()->has('page') ? request('page') : 1;
 
-        $jsonResponse = Http::get('https://newsapi.org/v2/top-headlines?country=us&pageSize='.$perPage.'&page='.$currentPage.'&apiKey='.$url.'');
-        $news = collect(json_decode($jsonResponse, true))->jsonserialize();
+        $news = Http::get('https://newsapi.org/v2/top-headlines?country=us&pageSize='.$perPage.'&page='.$currentPage.'&apiKey='.$url.'')->json();
+        if($news['status'] !== "ok") {
+            return $news['message'];
+        }
+
         $offset = ceil(( $news['totalResults'] / $perPage) - 1);
 
         // Replace author value from randomUser
